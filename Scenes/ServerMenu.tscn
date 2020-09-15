@@ -1,0 +1,112 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/ServerMenu.gd" type="Script" id=1]
+
+[node name="ServerMenu" type="Control"]
+margin_right = 1020.0
+margin_bottom = 600.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PlayersReady" type="Panel" parent="."]
+visible = false
+margin_left = 379.67
+margin_top = 105.663
+margin_right = 672.67
+margin_bottom = 515.663
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PlayerList" type="ItemList" parent="PlayersReady"]
+margin_left = 38.0
+margin_top = 43.0
+margin_right = 266.0
+margin_bottom = 358.0
+
+[node name="Label" type="Label" parent="PlayersReady"]
+margin_left = 39.0
+margin_top = 13.0
+margin_right = 145.0
+margin_bottom = 37.0
+text = "Awaiting Players..."
+
+[node name="StartGame" type="Button" parent="PlayersReady"]
+margin_left = 105.0
+margin_top = 372.0
+margin_right = 191.0
+margin_bottom = 395.0
+text = "START!"
+
+[node name="Login" type="Panel" parent="."]
+margin_left = 358.0
+margin_top = 222.0
+margin_right = 696.0
+margin_bottom = 391.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HostButton" type="Button" parent="Login"]
+margin_left = 269.0
+margin_top = 55.0
+margin_right = 320.0
+margin_bottom = 75.0
+text = "Host"
+
+[node name="NameLabel" type="Label" parent="Login"]
+margin_left = 16.0
+margin_top = 57.0
+margin_right = 58.0
+margin_bottom = 75.0
+text = "Name:"
+
+[node name="EnterName" type="LineEdit" parent="Login"]
+margin_left = 61.0
+margin_top = 53.0
+margin_right = 264.0
+margin_bottom = 77.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="JoinButton" type="Button" parent="Login"]
+margin_left = 268.159
+margin_top = 99.5675
+margin_right = 319.159
+margin_bottom = 119.568
+text = "Join"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="IPLabel" type="Label" parent="Login"]
+margin_left = 15.1591
+margin_top = 101.568
+margin_right = 57.1591
+margin_bottom = 119.568
+text = "IP:"
+
+[node name="EnterAddress" type="LineEdit" parent="Login"]
+margin_left = 60.1591
+margin_top = 97.5675
+margin_right = 263.159
+margin_bottom = 121.568
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ErrorLabel" type="Label" parent="Login"]
+margin_left = 16.0
+margin_top = 136.0
+margin_right = 318.0
+margin_bottom = 150.0
+
+[node name="ErrorDialog" type="AcceptDialog" parent="."]
+margin_right = 83.0
+margin_bottom = 58.0
+[connection signal="pressed" from="PlayersReady/StartGame" to="." method="_on_StartGame_pressed"]
+[connection signal="pressed" from="Login/HostButton" to="." method="_on_HostButton_pressed"]
+[connection signal="pressed" from="Login/JoinButton" to="." method="_on_JoinButton_pressed"]
