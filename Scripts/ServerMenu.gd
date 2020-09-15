@@ -21,6 +21,9 @@ func _ready():
 	else:
 		var desktop_path = OS.get_system_dir(0).replace("\\", "/").split("/")
 		get_node("Login/EnterName").text = desktop_path[desktop_path.size() - 2]
+	
+	# Set IP address to default, home
+	get_node("Login/EnterAddress").text = "127.0.0.1"
 	pass # Replace with function body.
 
 

@@ -16,8 +16,6 @@ func check_hittable():
 		player.add_to_group("Hittable")
 	for enemy in get_node("Enemies").get_children():
 		enemy.add_to_group("Hittable")
-	for platform in get_node("Platforms").get_children():
-		platform.add_to_group("Hittable")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
