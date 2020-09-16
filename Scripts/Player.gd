@@ -29,6 +29,8 @@ var is_jumping := false
 
 #var player_angle := 0
 
+var spawn_point := Vector2()
+
 export var default_health = 10
 export(int) onready var player_health = default_health
 
@@ -83,39 +85,48 @@ func get_input(delta):
 	
 	pass
 
-func jump():
-	player_velocity.y = -jump_force
+func jump(velocity):
+	velocity.y = -jump_force
 	is_jumping = false
+	return velocity
 
 func set_movement(delta):
+	var velocity := Vector2()
+	
 	if is_network_master():
-		player_velocity.x = player_speed * x_input
+		velocity.x = player_speed * x_input
+		velocity.y = player_velocity.y
 	
 		if(is_jumping and is_on_floor()):
-			jump()
+			velocity = jump(velocity)
 			print("normal_jump")
-			print(str(player_velocity))
+			print(str(velocity))
 		elif(is_jumping and is_on_wall()):
-			jump()
-			print("left_wall_jump")
-			print(str(player_velocity))
+			velocity = jump(velocity)
+			print("wall_jump")
+			print(str(velocity))
 		elif(is_jumping and air_jumps_left > 0):
-			jump()
+			velocity = jump(velocity)
 			air_jumps_left -= 1
 			print("air_jumps_left: " + str(air_jumps_left))
-			print(str(player_velocity))
+			print(str(velocity))
 		elif(is_on_floor()):
-			player_velocity.y = 0
+			velocity.y = 0
 			air_jumps_left = air_jumps
 		elif(!is_on_floor()):
-			player_velocity.y += gravity * delta
+			velocity.y += gravity * delta
 		
-		rset("player_velocity", player_velocity)
-		rset("player_position", player_position)
+		rset("player_velocity", velocity)
+		player_velocity = velocity # so i can save the data of this velocity to use elsewhere
+		rset("player_position", position)
 	else:
 		position = player_position
+		velocity = player_velocity
 	
-	move_and_slide(player_velocity, Vector2(0, -1)) #added a floor 
+	#print("velocity: ", velocity)
+	#print("player_velocity: ", player_velocity)
+	
+	move_and_slide(velocity, Vector2(0, -1)) #added a floor 
 	
 	if not is_network_master():
 		player_position = position # To avoid jitter
@@ -157,7 +168,8 @@ func death():
 	#RESPAWN
 	shield_health = default_shield
 	player_health = default_health
-	position = get_parent().get_node("SpawnPoints/0").position
+	position = spawn_point
+	rset("player_position", position)
 	pass
 
 func set_player_name(new_name):

@@ -50,4 +50,7 @@ shape = SubResource( 2 )
 
 [node name="1" type="Position2D" parent="SpawnPoints"]
 position = Vector2( 200, 0 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2( 4, 4 )
 [connection signal="body_entered" from="Deadline" to="Deadline" method="_on_Deadline_body_entered"]
