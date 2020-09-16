@@ -62,7 +62,7 @@ func _ready():
 func _physics_process(delta):
 	get_input(delta)
 	set_movement(delta)
-	#set_direction()
+	set_camera()
 	set_shoot_rotation()
 	set_shoot_position()
 	do_attack(delta)
@@ -135,6 +135,16 @@ func set_movement(delta):
 	if not is_network_master():
 		player_position = position # To avoid jitter
 	pass
+
+#this is inefficent
+func set_camera():
+	if is_network_master():
+		for player in get_parent().get_children():
+			if(player == self):
+				player.get_node("Camera2D").current = true
+			else:
+				player.get_node("Camera2D").current = false
+			pass
 
 
 func set_shoot_rotation():

@@ -19,5 +19,6 @@ func check_hittable():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	# doing this is also really inefficent
 	check_hittable()
 	pass
