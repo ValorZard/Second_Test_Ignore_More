@@ -36,6 +36,7 @@ func on_hit(body):
 	#self.queue_free()
 	if body.is_in_group("Hittable"):
 		body.on_hit(bullet_damage)
+		body.set_attacking(node_this_belongs_to)
 		pass
 	destroy()
 	pass

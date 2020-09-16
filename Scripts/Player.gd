@@ -41,6 +41,10 @@ var shield_pressed := false
 puppet var is_shooting := false
 puppet var shoot_direction := Vector2()
 #var special_pressed := false
+puppet var who_is_attacking
+puppet var score := 0
+
+var score_worth := 1
 
 #var melee_pressed := false
 var bullet_template = preload("res://Scenes/Bullet.tscn")
@@ -68,7 +72,9 @@ func _physics_process(delta):
 	set_shoot_rotation()
 	set_shoot_position()
 	do_attack(delta)
+	# send information to ui, make this a function later
 	get_node("DebugLabel").text = to_string()
+	get_node("NameLabel").set_text(player_name + ", " + str(score))
 	pass
 
 func get_input(delta):
@@ -162,6 +168,12 @@ func set_shoot_rotation():
 func set_shoot_position():
 	get_node("BulletExit").position = shoot_direction * bullet_exit_radius + self.position
 
+func set_attacking(player_responsible):
+	# this is so that the last person who hits the player gets the kill
+	who_is_attacking = player_responsible
+	rset("who_is_attacking", who_is_attacking)
+	pass
+
 func do_attack(delta):
 	time_left_till_next_bullet -= delta
 	if(is_shooting and time_left_till_next_bullet <= 0):
@@ -184,6 +196,7 @@ func on_hit(damage):
 	elif (player_health > 0):
 		player_health -= damage
 	else:
+		who_is_attacking.add_to_score(score_worth)
 		death()
 	pass
 
@@ -191,13 +204,19 @@ func death():
 	#RESPAWN
 	shield_health = default_shield
 	player_health = default_health
+	score -= 1
 	position = spawn_point
 	rset("player_position", position)
+	rset("score", score)
+	pass
+
+func add_to_score(points):
+	score += points
+	rset("score", score)
 	pass
 
 func set_player_name(new_name):
 	player_name = new_name
-	get_node("NameLabel").set_text(player_name)
 
 func _to_string():
 	var player_string := ""
