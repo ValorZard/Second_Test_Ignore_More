@@ -38,8 +38,8 @@ export var default_shield := 10
 export(int) onready var shield_health := default_shield
 var shield_pressed := false
 
-var is_shooting := false
-var shoot_direction := Vector2()
+puppet var is_shooting := false
+puppet var shoot_direction := Vector2()
 #var special_pressed := false
 
 #var melee_pressed := false
@@ -64,25 +64,29 @@ func _physics_process(delta):
 	set_movement(delta)
 	#set_direction()
 	set_shoot_rotation()
+	set_shoot_position()
 	do_attack(delta)
+	get_node("DebugLabel").text = to_string()
 	pass
 
 func get_input(delta):
-	x_input = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
-	#y_input = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
+	if is_network_master():
+		x_input = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+		#y_input = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
 	
-	#check for facing direction
-	if(x_input >= 0):
-		facing_left = false
-	else:
-		facing_left = true
+		#check for facing direction
+		if(x_input >= 0):
+			facing_left = false
+		else:
+			facing_left = true
 	
-	shield_pressed = Input.is_action_pressed("shield")
+		shield_pressed = Input.is_action_pressed("shield")
+		
+		#networked variable
+		is_shooting = Input.is_action_pressed("shoot")
+		rset("is_shooting", is_shooting)
 	
-	is_shooting = Input.is_action_pressed("shoot")
-	
-	is_jumping = Input.is_action_just_pressed("jump_pressed")
-	
+		is_jumping = Input.is_action_just_pressed("jump_pressed")
 	pass
 
 func jump(velocity):
@@ -135,12 +139,16 @@ func set_movement(delta):
 
 func set_shoot_rotation():
 	#current_shoot.rotation_degrees = rad2deg(player_angle)
-	var mouse_direction := get_position().direction_to(get_global_mouse_position()) # getting direction to mouse
-	var bullet_angle := atan2(mouse_direction.y, mouse_direction.x)
-	shoot_direction = Vector2(cos(bullet_angle), sin(bullet_angle))
-	get_node("BulletExit").position = shoot_direction * bullet_exit_radius + self.position
+	if is_network_master():
+		var mouse_direction := get_position().direction_to(get_global_mouse_position()) # getting direction to mouse
+		var bullet_angle := atan2(mouse_direction.y, mouse_direction.x)
+		
+		shoot_direction = Vector2(cos(bullet_angle), sin(bullet_angle))
+		rset("shoot_direction", shoot_direction) #make sure that the other instances can see this
 	pass
 
+func set_shoot_position():
+	get_node("BulletExit").position = shoot_direction * bullet_exit_radius + self.position
 
 func do_attack(delta):
 	time_left_till_next_bullet -= delta
@@ -149,6 +157,7 @@ func do_attack(delta):
 		bullet.set_direction(shoot_direction)
 		bullet.bullet_speed = bullet_speed
 		bullet.position = get_node("BulletExit").position
+		print(bullet.position)
 		bullet.node_this_belongs_to = self
 		get_tree().get_root().add_child(bullet)
 		time_left_till_next_bullet = fire_rate
@@ -187,5 +196,7 @@ func _to_string():
 	player_string += "Shield: " + str(shield_pressed) + "\nShield Health: " + str(shield_health) + "\n"
 	
 	player_string += "Shooting: " + str(is_shooting) + "\n"
+	
+	player_string += "Shoot Direction" + str(shoot_direction) + "\n"
 
 	return player_string

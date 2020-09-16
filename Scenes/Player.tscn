@@ -32,3 +32,12 @@ margin_bottom = -45.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="DebugLabel" type="Label" parent="."]
+margin_left = -30.6674
+margin_top = 37.7757
+margin_right = 29.3326
+margin_bottom = 51.7757
+__meta__ = {
+"_edit_use_anchors_": false
+}
