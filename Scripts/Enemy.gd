@@ -14,6 +14,8 @@ var shield_pressed := false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	self.add_to_group("Collision")
+	self.add_to_group("Hittable")
 	pass # Replace with function body.
 
 

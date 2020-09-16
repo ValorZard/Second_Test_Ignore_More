@@ -55,6 +55,8 @@ func _ready():
 	set_shoot_rotation()
 	set_player_name(player_name)
 	player_position = position
+	self.add_to_group("Collision")
+	self.add_to_group("Hittable")
 	pass # Replace with function body.
 
 
@@ -167,7 +169,7 @@ func do_attack(delta):
 		bullet.set_direction(shoot_direction)
 		bullet.bullet_speed = bullet_speed
 		bullet.position = get_node("BulletExit").position
-		print(bullet.position)
+		#print(bullet.position)
 		bullet.node_this_belongs_to = self
 		get_tree().get_root().add_child(bullet)
 		time_left_till_next_bullet = fire_rate
@@ -175,6 +177,8 @@ func do_attack(delta):
 	pass
 
 func on_hit(damage):
+	#print("PLAYER HIT")
+	
 	if(shield_health > 0):
 		shield_health -= damage
 	elif (player_health > 0):
