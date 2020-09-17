@@ -56,7 +56,6 @@ var time_left_till_next_bullet = fire_rate
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	set_shoot_rotation()
 	set_player_name(player_name)
 	player_position = position
 	self.add_to_group("Collision")
@@ -69,7 +68,6 @@ func _physics_process(delta):
 	get_input(delta)
 	set_movement(delta)
 	set_camera()
-	set_shoot_rotation()
 	set_shoot_position()
 	do_attack(delta)
 	# send information to ui, make this a function later
@@ -90,11 +88,19 @@ func get_input(delta):
 	
 		shield_pressed = Input.is_action_pressed("shield")
 		
-		#networked variable
+		# setting states
 		is_shooting = Input.is_action_pressed("shoot")
-		rset("is_shooting", is_shooting)
 	
 		is_jumping = Input.is_action_just_pressed("jump_pressed")
+		
+		# set shooting direction
+		var mouse_direction := get_position().direction_to(get_global_mouse_position()) # getting direction to mouse
+		var bullet_angle := atan2(mouse_direction.y, mouse_direction.x)
+		
+		shoot_direction = Vector2(cos(bullet_angle), sin(bullet_angle))
+		
+		rset("is_shooting", is_shooting)
+		rset("shoot_direction", shoot_direction) #make sure that the other instances can see this
 	pass
 
 func jump(velocity):
@@ -130,7 +136,7 @@ func set_movement(delta):
 		
 		rset("player_velocity", velocity)
 		player_velocity = velocity # so i can save the data of this velocity to use elsewhere
-		rset("player_position", position)
+		rset_unreliable("player_position", position)
 	else:
 		position = player_position
 		velocity = player_velocity
@@ -154,16 +160,6 @@ func set_camera():
 				player.get_node("Camera2D").current = false
 			pass
 
-
-func set_shoot_rotation():
-	#current_shoot.rotation_degrees = rad2deg(player_angle)
-	if is_network_master():
-		var mouse_direction := get_position().direction_to(get_global_mouse_position()) # getting direction to mouse
-		var bullet_angle := atan2(mouse_direction.y, mouse_direction.x)
-		
-		shoot_direction = Vector2(cos(bullet_angle), sin(bullet_angle))
-		rset("shoot_direction", shoot_direction) #make sure that the other instances can see this
-	pass
 
 func set_shoot_position():
 	get_node("BulletExit").position = shoot_direction * bullet_exit_radius + self.position
