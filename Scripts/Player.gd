@@ -22,7 +22,9 @@ var gravity := 1200
 var jump_force := 600
 var air_jumps := 2 #number of air jumps
 var air_jumps_left = air_jumps
-var is_jumping := false
+
+var	jump_persistance_time_frame := 0.2 # The time frame after the last jump press will still activate
+var jump_persistance_time_left := 0.0 # The current time frame left for jump to be called
 
 #enum Direction{UP, DOWN, LEFT, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT}
 #var current_direction = Direction.UP
@@ -91,7 +93,11 @@ func get_input(delta):
 		# setting states
 		is_shooting = Input.is_action_pressed("shoot")
 	
-		is_jumping = Input.is_action_just_pressed("jump_pressed")
+		if Input.is_action_just_pressed("jump_pressed"):
+			jump_persistance_time_left = jump_persistance_time_frame
+		elif jump_persistance_time_left > 0:
+			jump_persistance_time_left -= delta
+			jump_persistance_time_left = clamp(jump_persistance_time_left, 0, jump_persistance_time_frame)
 		
 		# set shooting direction
 		var mouse_direction := get_position().direction_to(get_global_mouse_position()) # getting direction to mouse
@@ -105,7 +111,7 @@ func get_input(delta):
 
 func jump(velocity):
 	velocity.y = -jump_force
-	is_jumping = false
+	jump_persistance_time_left = 0
 	return velocity
 
 func set_movement(delta):
@@ -115,15 +121,16 @@ func set_movement(delta):
 		velocity.x = player_speed * x_input
 		velocity.y = player_velocity.y
 	
-		if(is_jumping and is_on_floor()):
+		if(jump_persistance_time_left > 0 and is_on_floor()):
 			velocity = jump(velocity)
+			air_jumps_left = air_jumps
 			print("normal_jump")
 			print(str(velocity))
-		elif(is_jumping and is_on_wall()):
+		elif(jump_persistance_time_left > 0 and is_on_wall()):
 			velocity = jump(velocity)
 			print("wall_jump")
 			print(str(velocity))
-		elif(is_jumping and air_jumps_left > 0):
+		elif(jump_persistance_time_left > 0 and air_jumps_left > 0):
 			velocity = jump(velocity)
 			air_jumps_left -= 1
 			print("air_jumps_left: " + str(air_jumps_left))
